@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { CategorySelect } from './CategorySelect'
+import { ImageUpload } from './ImageUpload'
 import { UI_TEXT } from '../constants/uiText'
 import { CLOTHING_STATUSES } from '../constants/clothingStatuses'
 
@@ -11,9 +12,22 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
     marke: clothing?.marke || '',
     groesse: clothing?.groesse || '',
     status: clothing?.status || 'vorhanden',
-    notizen: clothing?.notizen || ''
+    notizen: clothing?.notizen || '',
+    imageUrl: clothing?.imageUrl || null,
+    imagePath: clothing?.imagePath || null
   })
   const [error, setError] = useState('')
+  const [imageFile, setImageFile] = useState(null)
+  const [imageError, setImageError] = useState('')
+
+  // Cleanup blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (imageFile) {
+        URL.revokeObjectURL(URL.createObjectURL(imageFile))
+      }
+    }
+  }, [imageFile])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -23,7 +37,19 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
       return
     }
 
-    onSave(formData)
+    onSave(formData, imageFile)
+  }
+
+  const handleImageChange = (file) => {
+    setImageFile(file)
+    setImageError('')
+  }
+
+  const handleImageClear = () => {
+    setImageFile(null)
+    handleChange('imageUrl', null)
+    handleChange('imagePath', null)
+    setImageError('')
   }
 
   const handleChange = (field, value) => {
@@ -133,6 +159,22 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Optionale Notizen..."
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {UI_TEXT.clothing.image}
+            </label>
+            <ImageUpload
+              value={imageFile ? URL.createObjectURL(imageFile) : formData.imageUrl}
+              onChange={handleImageChange}
+              onClear={handleImageClear}
+              disabled={false}
+              error={imageError}
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              {UI_TEXT.clothing.imageOptional}
+            </p>
           </div>
 
           <div className="flex gap-3 pt-4">

@@ -1,11 +1,29 @@
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, Image as ImageIcon } from 'lucide-react'
 import { StatusBadge } from './StatusBadge'
 import { UI_TEXT } from '../constants/uiText'
 
 export function ClothingCard({ item, onStatusChange, onEdit, onDelete }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-3">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+      {/* Image Section */}
+      {item.imageUrl ? (
+        <div className="relative w-full h-48 bg-gray-100">
+          <img
+            src={item.imageUrl}
+            alt={item.kategorie}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      ) : (
+        <div className="relative w-full h-48 bg-gray-100 flex items-center justify-center">
+          <ImageIcon size={48} className="text-gray-400" />
+        </div>
+      )}
+
+      {/* Content Section */}
+      <div className="p-4">
+        <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-800">{item.kategorie}</h3>
           <div className="text-sm text-gray-600 space-y-1 mt-1">
@@ -56,6 +74,7 @@ export function ClothingCard({ item, onStatusChange, onEdit, onDelete }) {
             <Trash2 size={18} />
           </button>
         </div>
+      </div>
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useFirestoreCollection } from './hooks/useFirestoreCollection'
+import { uploadClothingImage, deleteClothingImage } from './firebase/storage'
 import { Dashboard } from './components/Dashboard'
 import { PersonForm } from './components/PersonForm'
 import { ConfirmDialog } from './components/ConfirmDialog'
@@ -80,9 +81,18 @@ function App() {
   const handleConfirmDelete = async (person) => {
     try {
       await personsCollection.deleteItem(person.id)
-      // Also delete all clothing items for this person
+
+      // Delete all clothing items and their images
       const personClothing = clothing.filter(c => c.personId === person.id)
-      await Promise.all(personClothing.map(item => clothingCollection.deleteItem(item.id)))
+      await Promise.all(personClothing.map(async (item) => {
+        // Delete image from Storage if exists
+        if (item.imagePath) {
+          await deleteClothingImage(item.imagePath)
+        }
+        // Delete Firestore document
+        await clothingCollection.deleteItem(item.id)
+      }))
+
       setDeleteConfirmPerson(null)
       setToast({ message: UI_TEXT.personDeleted, type: 'success' })
     } catch (error) {
@@ -110,19 +120,67 @@ function App() {
     setCurrentView('editClothing')
   }
 
-  const handleSaveClothing = async (formData) => {
+  const handleSaveClothing = async (formData, imageFile) => {
     try {
+      let imageUrl = formData.imageUrl
+      let imagePath = formData.imagePath
+
       if (currentView === 'addClothing') {
+        // Create Firestore document first to get the ID
         const newItem = {
           personId: selectedPerson.id,
-          ...formData
+          ...formData,
+          imageUrl: null,
+          imagePath: null
         }
-        await clothingCollection.addItem(newItem)
+        const docId = await clothingCollection.addItem(newItem)
+
+        // Upload image if provided
+        if (imageFile) {
+          const { downloadURL, storagePath } = await uploadClothingImage(
+            imageFile,
+            selectedPerson.id,
+            docId
+          )
+          imageUrl = downloadURL
+          imagePath = storagePath
+
+          // Update document with image URLs
+          await clothingCollection.updateItem(docId, {
+            imageUrl,
+            imagePath
+          })
+        }
+
         setToast({ message: UI_TEXT.clothing.clothingAdded, type: 'success' })
+
       } else if (currentView === 'editClothing') {
-        await clothingCollection.updateItem(editingClothing.id, formData)
+        // Handle image replacement
+        if (imageFile) {
+          // Delete old image if exists
+          if (editingClothing.imagePath) {
+            await deleteClothingImage(editingClothing.imagePath)
+          }
+
+          // Upload new image
+          const { downloadURL, storagePath } = await uploadClothingImage(
+            imageFile,
+            selectedPerson.id,
+            editingClothing.id
+          )
+          imageUrl = downloadURL
+          imagePath = storagePath
+        }
+
+        await clothingCollection.updateItem(editingClothing.id, {
+          ...formData,
+          imageUrl,
+          imagePath
+        })
+
         setToast({ message: UI_TEXT.clothing.clothingUpdated, type: 'success' })
       }
+
       setCurrentView('personDetail')
       setEditingClothing(null)
     } catch (error) {
@@ -133,6 +191,12 @@ function App() {
 
   const handleDeleteClothing = async (item) => {
     try {
+      // Delete image from Storage if exists
+      if (item.imagePath) {
+        await deleteClothingImage(item.imagePath)
+      }
+
+      // Delete Firestore document
       await clothingCollection.deleteItem(item.id)
       setToast({ message: UI_TEXT.clothing.clothingDeleted, type: 'success' })
     } catch (error) {

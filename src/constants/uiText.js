@@ -64,6 +64,19 @@ export const UI_TEXT = {
     clothingAdded: 'Kleidungsstück erfolgreich hinzugefügt',
     clothingUpdated: 'Kleidungsstück erfolgreich aktualisiert',
     clothingDeleted: 'Kleidungsstück erfolgreich gelöscht',
-    statusUpdated: 'Status erfolgreich aktualisiert'
+    statusUpdated: 'Status erfolgreich aktualisiert',
+    image: 'Bild',
+    imageOptional: 'Optional: Foto des Kleidungsstücks hinzufügen',
+    uploadImage: 'Bild hochladen',
+    takePhoto: 'Foto aufnehmen',
+    changeImage: 'Bild ändern',
+    removeImage: 'Bild entfernen',
+    imagePreview: 'Bildvorschau',
+    uploadingImage: 'Bild wird hochgeladen...',
+    imageUploadError: 'Fehler beim Hochladen des Bildes',
+    imageTooLarge: 'Bild ist zu groß (max. 5MB)',
+    invalidImageType: 'Ungültiges Bildformat',
+    dragDropImage: 'Bild hierher ziehen oder klicken zum Auswählen',
+    noImage: 'Kein Bild vorhanden'
   }
 }
