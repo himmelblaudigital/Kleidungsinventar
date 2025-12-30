@@ -1,0 +1,123 @@
+import { useState } from 'react'
+import { X } from 'lucide-react'
+import { IconPicker } from './IconPicker'
+import { CATEGORIES } from '../constants/categories'
+import { UI_TEXT } from '../constants/uiText'
+
+export function PersonForm({ mode, person, onSave, onCancel }) {
+  const [formData, setFormData] = useState({
+    name: person?.name || '',
+    kategorie: person?.kategorie || 'kind',
+    groesse: person?.groesse || '',
+    avatar: person?.avatar || 'User'
+  })
+  const [error, setError] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    if (!formData.name.trim()) {
+      setError(UI_TEXT.nameRequired)
+      return
+    }
+
+    onSave(formData)
+  }
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    if (error) setError('')
+  }
+
+  return (
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-800">
+            {mode === 'add' ? UI_TEXT.addPerson : UI_TEXT.editPerson}
+          </h2>
+          <button
+            onClick={onCancel}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label={UI_TEXT.cancel}
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              {UI_TEXT.name} *
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={UI_TEXT.name}
+              autoFocus
+            />
+            {error && (
+              <p className="mt-1 text-sm text-red-600">{error}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="kategorie" className="block text-sm font-medium text-gray-700 mb-1">
+              {UI_TEXT.category}
+            </label>
+            <select
+              id="kategorie"
+              value={formData.kategorie}
+              onChange={(e) => handleChange('kategorie', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {CATEGORIES.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="groesse" className="block text-sm font-medium text-gray-700 mb-1">
+              {UI_TEXT.size}
+            </label>
+            <input
+              type="text"
+              id="groesse"
+              value={formData.groesse}
+              onChange={(e) => handleChange('groesse', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="z.B. 122cm, M, 38"
+            />
+          </div>
+
+          <IconPicker
+            selectedIcon={formData.avatar}
+            onSelectIcon={(icon) => handleChange('avatar', icon)}
+          />
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              {UI_TEXT.cancel}
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            >
+              {UI_TEXT.save}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}

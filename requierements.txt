@@ -1,0 +1,73 @@
+📋 Anforderungsdokument: Household Wardrobe Manager
+1. Zielsetzung
+
+Entwicklung einer React-Web-App zur Verwaltung der Kleidung aller Haushaltsmitglieder. Ziel ist es, den Überblick über den Bestand zu behalten (Inventur), Fehlkäufe zu vermeiden und den Zustand der Kleidung zu tracken.
+
+2. Tech-Stack (Empfehlung)
+
+Framework: React (mit Vite)
+
+Styling: Tailwind CSS (für schnelles, responsives Design)
+
+Icons: Lucide-React
+
+Datenhaltung: LocalStorage (für die erste Version) oder Supabase/Firebase (falls Cloud-Sync gewünscht ist).
+
+3. Datenmodell (Data Schema)
+
+Die KI muss wissen, wie die Daten verknüpft sind. Hier ist ein Vorschlag:
+
+Person: id, name, avatar, groesse.
+
+Kleidungsstück: id, personId (FK), kategorie (T-Shirt, Hose, etc.), farbe, marke, status (vorhanden, aussortiert, zu klein), bildURL.
+
+4. Funktionale Anforderungen (Features)
+
+A. Personen-Management
+
+Dashboard mit einer Übersicht aller Bewohner.
+
+Funktion "Bewohner hinzufügen" (Name, Profilbild/Icon).
+
+Löschen oder Bearbeiten von Bewohner-Profilen.
+
+B. Inventur-Modul (Kernfunktion)
+
+Listenansicht: Pro Person eine Liste aller Kleidungsstücke.
+
+Filter/Suche: Filtern nach Kategorien (z. B. "Zeige nur Winterjacken von Kind A").
+
+Schnell-Inventur: Ein Button pro Kleidungsstück, um den Status zu ändern (z.B. ein Toggle von "Passt noch" auf "Zu klein/Aussortieren").
+
+Hinzufügen-Formular: Neues Teil erfassen (Kategorie-Dropdown, Freitext für Marke, Foto-Upload-Platzhalter).
+
+C. Statistiken (Optional)
+
+Anzeige: "Person A hat 12 T-Shirts, 3 sind zu klein."
+
+5. UI/UX Struktur
+
+Home: Grid-Ansicht der Personen.
+
+Person-Detail-View: Kopfbereich mit Name + Statistik; darunter die Liste der Kleidung.
+
+Add-Item-Modal: Ein einfaches Popup zur Dateneingabe.
+
+🛠️ Prompt für deinen KI-Bot
+Du kannst der KI folgenden Prompt schicken, um den Code zu generieren:
+
+"Erstelle eine React-App (Vite + Tailwind CSS) für eine Haushalts-Kleidungsverwaltung.
+
+Features:
+
+Startseite: Man kann Haushaltsmitglieder (Name, Icon) anlegen und in einer Liste/Grid sehen.
+
+Klick auf Person: Öffnet die Inventur-Liste dieser Person.
+
+Inventur-Funktion: Man kann Kleidungsstücke hinzufügen (Kategorie-Dropdown, Marke, Größe, Status).
+
+Status-Update: Jedes Kleidungsstück hat einen Button 'Zustand ändern' (z.B. 'Passt', 'Zu klein', 'Spenden').
+
+Persistenz: Speichere alle Daten im LocalStorage des Browsers.
+
+Bitte erstelle eine saubere Komponenten-Struktur (Header, PersonCard, InventoryTable, AddItemForm) und nutze Lucide-React für Icons. Das Design soll modern, hell und mobilfreundlich sein."
