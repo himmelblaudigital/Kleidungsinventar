@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===================================================================
+    // STUFE 1: Basis-Validierung (Empfohlen für Start)
+    // Öffentlicher Zugriff, aber mit Datenvalidierung
+    // ===================================================================
+
+    // Persons Collection
+    match /persons/{personId} {
+      // Lesen: Öffentlich
+      allow read: if true;
+
+      // Erstellen: Mit Validierung
+      allow create: if request.resource.data.keys().hasAll(['name', 'avatar', 'kategorie', 'groesse'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.avatar is string
+        && request.resource.data.kategorie is string
+        && request.resource.data.groesse is string;
+
+      // Aktualisieren: Mit Validierung
+      allow update: if request.resource.data.keys().hasAll(['name', 'avatar', 'kategorie', 'groesse'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100;
+
+      // Löschen: Erlaubt
+      allow delete: if true;
+    }
+
+    // Clothing Collection
+    match /clothing/{clothingId} {
+      // Lesen: Öffentlich
+      allow read: if true;
+
+      // Erstellen: Mit Validierung
+      allow create: if request.resource.data.keys().hasAll(['personId', 'kategorie', 'status'])
+        && request.resource.data.kategorie is string
+        && request.resource.data.kategorie.size() > 0
+        && request.resource.data.kategorie.size() <= 50
+        && request.resource.data.status in ['vorhanden', 'zu_klein', 'aussortiert']
+        // Optional fields validation
+        && (!request.resource.data.keys().hasAny(['farbe']) || request.resource.data.farbe.size() <= 50)
+        && (!request.resource.data.keys().hasAny(['marke']) || request.resource.data.marke.size() <= 50)
+        && (!request.resource.data.keys().hasAny(['groesse']) || request.resource.data.groesse.size() <= 20)
+        && (!request.resource.data.keys().hasAny(['notizen']) || request.resource.data.notizen.size() <= 500)
+        && (!request.resource.data.keys().hasAny(['imageUrl']) || request.resource.data.imageUrl.size() <= 2048)
+        && (!request.resource.data.keys().hasAny(['imagePath']) || request.resource.data.imagePath.size() <= 500);
+
+      // Aktualisieren: Mit Validierung
+      allow update: if request.resource.data.kategorie is string
+        && request.resource.data.status in ['vorhanden', 'zu_klein', 'aussortiert'];
+
+      // Löschen: Erlaubt
+      allow delete: if true;
+    }
+  }
+}
+
+// ===================================================================
+// HINWEIS: Für Produktion mit Authentication siehe:
+// SECURITY_BEST_PRACTICES.md - Stufe 3
+// ===================================================================

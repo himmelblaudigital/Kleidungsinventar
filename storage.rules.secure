@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ===================================================================
+    // STUFE 1: Basis-Validierung (Empfohlen für Start)
+    // Öffentlicher Zugriff, aber mit strikter Validierung
+    // ===================================================================
+
+    match /clothing/{personId}/{clothingId}/{fileName} {
+      // Lesen: Öffentlich
+      allow read: if true;
+
+      // Schreiben: Mit strikter Validierung
+      allow write: if request.resource != null
+        // Nur Bilder
+        && request.resource.contentType.matches('image/.*')
+        // Max 5MB
+        && request.resource.size < 5 * 1024 * 1024
+        // Nur erlaubte Bildformate
+        && request.resource.contentType in [
+          'image/jpeg',
+          'image/jpg',
+          'image/png',
+          'image/gif',
+          'image/webp'
+        ]
+        // Dateiname muss 'image' enthalten und korrekte Endung haben
+        && fileName.matches('image\\.(jpg|jpeg|png|gif|webp)');
+
+      // Löschen: Erlaubt
+      allow delete: if true;
+    }
+
+    // Alle anderen Pfade: Blockiert
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// ===================================================================
+// VORTEILE dieser Rules:
+// ✅ Verhindert Upload von Nicht-Bild-Dateien
+// ✅ Begrenzt Dateigröße auf 5MB
+// ✅ Erlaubt nur sichere Bildformate
+// ✅ Verhindert Upload außerhalb des clothing-Ordners
+// ===================================================================
+
+// ===================================================================
+// HINWEIS: Für Produktion mit Authentication siehe:
+// SECURITY_BEST_PRACTICES.md - Stufe 3
+// ===================================================================
