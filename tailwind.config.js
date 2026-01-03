@@ -8,14 +8,19 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#6366f1',
-          content: '#ffffff',
+          DEFAULT: '#1b5e20', // Dunkelgrün
+          light: '#a5d6a7',   // Hellgrün für Text
+          bg: '#e8f5e9',      // Sehr hellgrün für Hintergrund
         },
-        secondary: '#8b5cf6',
-        accent: '#ec4899',
+        secondary: {
+          DEFAULT: '#a5d6a7', // Hellgrün
+          dark: '#1b5e20',    // Dunkelgrün für Border
+        },
+        accent: '#66bb6a',
         error: '#ef4444',
-        success: '#10b981',
+        success: '#2e7d32',
         warning: '#f59e0b',
+        background: '#f1f8f4', // Hellgrüner Seitenhintergrund
       },
     },
   },

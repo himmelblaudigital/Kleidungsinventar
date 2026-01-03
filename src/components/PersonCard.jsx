@@ -26,14 +26,14 @@ export function PersonCard({ person, onEdit, onDelete, onViewClothing }) {
         <div className="flex flex-col gap-2 mt-4">
           <button
             onClick={() => onViewClothing(person)}
-            className="w-full bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-light px-4 py-2 rounded-lg transition-colors font-medium"
           >
             {UI_TEXT.clothing.viewClothing}
           </button>
           <div className="flex gap-2 w-full">
             <button
               onClick={() => onEdit(person)}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg transition-colors"
+              className="flex-1 bg-secondary border-2 border-secondary-dark text-secondary-dark hover:bg-secondary/80 px-3 py-2 rounded-lg transition-colors font-medium"
             >
               {UI_TEXT.edit}
             </button>

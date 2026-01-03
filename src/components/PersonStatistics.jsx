@@ -1,33 +1,30 @@
 import { UI_TEXT } from '../constants/uiText'
+import { CLOTHING_STATUSES } from '../constants/clothingStatuses'
 
 export function PersonStatistics({ clothing }) {
   const total = clothing.length
+  const passt = clothing.filter((item) => item.status === 'vorhanden').length
+  const zuGross = clothing.filter((item) => item.status === 'zu_gross').length
   const zuKlein = clothing.filter((item) => item.status === 'zu_klein').length
   const aussortiert = clothing.filter((item) => item.status === 'aussortiert').length
 
+  const stats = [
+    { label: 'Gesamt', value: total, color: 'text-primary' },
+    { label: CLOTHING_STATUSES.vorhanden.label, value: passt, color: 'text-success' },
+    { label: CLOTHING_STATUSES.zu_gross.label, value: zuGross, color: 'text-blue-600', show: zuGross > 0 },
+    { label: CLOTHING_STATUSES.zu_klein.label, value: zuKlein, color: 'text-warning', show: zuKlein > 0 },
+    { label: CLOTHING_STATUSES.aussortiert.label, value: aussortiert, color: 'text-error', show: aussortiert > 0 }
+  ].filter(stat => stat.show !== false)
+
   return (
-    <div className="stats shadow bg-base-100 mb-6">
-      <div className="stat">
-        <div className="stat-title">Gesamt</div>
-        <div className="stat-value text-primary text-2xl">{total}</div>
-        <div className="stat-desc">{UI_TEXT.clothing.items}</div>
-      </div>
-
-      {zuKlein > 0 && (
-        <div className="stat">
-          <div className="stat-title">Zu klein</div>
-          <div className="stat-value text-warning text-2xl">{zuKlein}</div>
-          <div className="stat-desc">{UI_TEXT.clothing.itemsToSmall}</div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      {stats.map((stat, index) => (
+        <div key={index} className="bg-white rounded-lg shadow-md p-4 text-center">
+          <div className="text-sm font-medium text-gray-600 mb-1">{stat.label}</div>
+          <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
+          {index === 0 && <div className="text-xs text-gray-500 mt-1">{UI_TEXT.clothing.items}</div>}
         </div>
-      )}
-
-      {aussortiert > 0 && (
-        <div className="stat">
-          <div className="stat-title">Aussortiert</div>
-          <div className="stat-value text-error text-2xl">{aussortiert}</div>
-          <div className="stat-desc">{UI_TEXT.clothing.itemsSorted}</div>
-        </div>
-      )}
+      ))}
     </div>
   )
 }

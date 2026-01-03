@@ -29,7 +29,10 @@ export const UI_TEXT = {
     editClothing: 'Kleidung bearbeiten',
     viewClothing: 'Kleidung anzeigen',
     allClothing: 'Alle Kleidung',
+    quickAdd: 'Kleidung hinzufügen',
     backToDashboard: 'Zurück zur Übersicht',
+    selectPerson: 'Person auswählen',
+    personRequired: 'Person ist erforderlich',
     category: 'Kategorie',
     color: 'Farbe',
     brand: 'Marke',
@@ -52,6 +55,7 @@ export const UI_TEXT = {
     filters: {
       all: 'Alle',
       vorhanden: 'Passt noch',
+      zu_gross: 'Noch zu groß',
       zu_klein: 'Zu klein',
       aussortiert: 'Aussortiert'
     },

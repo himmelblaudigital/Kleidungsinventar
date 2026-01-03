@@ -115,6 +115,12 @@ function App() {
     setCurrentView('addClothing')
   }
 
+  const handleQuickAddClothing = () => {
+    setSelectedPerson(null)
+    setEditingClothing(null)
+    setCurrentView('quickAddClothing')
+  }
+
   const handleEditClothing = (item) => {
     setEditingClothing(item)
     setCurrentView('editClothing')
@@ -124,11 +130,12 @@ function App() {
     try {
       let imageUrl = formData.imageUrl
       let imagePath = formData.imagePath
+      const targetPersonId = formData.personId || selectedPerson?.id
 
-      if (currentView === 'addClothing') {
+      if (currentView === 'addClothing' || currentView === 'quickAddClothing') {
         // Create Firestore document first to get the ID
         const newItem = {
-          personId: selectedPerson.id,
+          personId: targetPersonId,
           ...formData,
           imageUrl: null,
           imagePath: null
@@ -139,7 +146,7 @@ function App() {
         if (imageFile) {
           const { downloadURL, storagePath } = await uploadClothingImage(
             imageFile,
-            selectedPerson.id,
+            targetPersonId,
             docId
           )
           imageUrl = downloadURL
@@ -181,7 +188,12 @@ function App() {
         setToast({ message: UI_TEXT.clothing.clothingUpdated, type: 'success' })
       }
 
-      setCurrentView('personDetail')
+      // Navigate back based on context
+      if (currentView === 'quickAddClothing') {
+        setCurrentView('dashboard')
+      } else {
+        setCurrentView('personDetail')
+      }
       setEditingClothing(null)
     } catch (error) {
       console.error('Error saving clothing:', error)
@@ -247,6 +259,7 @@ function App() {
           onDeleteClick={handleDeleteClick}
           onViewClothing={handleViewClothing}
           onViewAllClothing={handleViewAllClothing}
+          onQuickAddClothing={handleQuickAddClothing}
         />
       )}
 
@@ -287,8 +300,20 @@ function App() {
           mode={currentView}
           clothing={editingClothing}
           personId={selectedPerson.id}
+          persons={persons}
           onSave={handleSaveClothing}
           onCancel={handleBackToPersonDetail}
+        />
+      )}
+
+      {currentView === 'quickAddClothing' && (
+        <ClothingForm
+          mode="addClothing"
+          clothing={null}
+          personId={null}
+          persons={persons}
+          onSave={handleSaveClothing}
+          onCancel={handleBackToDashboard}
         />
       )}
 

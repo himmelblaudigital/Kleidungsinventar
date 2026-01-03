@@ -20,6 +20,7 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
   const statusCounts = useMemo(() => ({
     total: clothing.length,
     vorhanden: clothing.filter((item) => item.status === 'vorhanden').length,
+    zu_gross: clothing.filter((item) => item.status === 'zu_gross').length,
     zu_klein: clothing.filter((item) => item.status === 'zu_klein').length,
     aussortiert: clothing.filter((item) => item.status === 'aussortiert').length
   }), [clothing])
@@ -58,9 +59,9 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
     return (
       <div className="relative">
         {/* Person Badge */}
-        <div className="absolute top-2 left-2 z-10 badge badge-primary gap-1">
+        <div className="absolute top-2 left-2 z-10 bg-primary text-primary-light px-2 py-1 rounded-md flex items-center gap-1 text-xs font-medium shadow-sm">
           <IconComponent size={12} />
-          <span className="text-xs">{person.name}</span>
+          <span>{person.name}</span>
         </div>
 
         {/* Clothing Card */}
@@ -75,27 +76,25 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="btn btn-ghost gap-2 mb-4"
+            className="bg-secondary border-2 border-secondary-dark text-secondary-dark hover:bg-secondary/80 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium mb-4"
           >
             <ArrowLeft size={20} />
             {UI_TEXT.clothing.backToDashboard}
           </button>
 
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <h1 className="card-title text-2xl md:text-3xl">
-                {UI_TEXT.clothing.allClothing}
-              </h1>
-              <p className="opacity-70">
-                {clothing.length} {UI_TEXT.clothing.items} insgesamt
-              </p>
-            </div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+              {UI_TEXT.clothing.allClothing}
+            </h1>
+            <p className="text-gray-600 mt-1">
+              {clothing.length} {UI_TEXT.clothing.items} insgesamt
+            </p>
           </div>
         </div>
 
@@ -113,14 +112,14 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
           {/* Person and Category Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Person Filter */}
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text font-medium">{UI_TEXT.clothing.filterByPerson}</span>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {UI_TEXT.clothing.filterByPerson}
               </label>
               <select
                 value={activePersonFilter}
                 onChange={(e) => setActivePersonFilter(e.target.value)}
-                className="select select-bordered w-full"
+                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="all">{UI_TEXT.clothing.allPersons}</option>
                 {persons.map((person) => (
@@ -132,14 +131,14 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
             </div>
 
             {/* Category Filter */}
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text font-medium">{UI_TEXT.clothing.filterByCategory}</span>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {UI_TEXT.clothing.filterByCategory}
               </label>
               <select
                 value={activeCategoryFilter}
                 onChange={(e) => setActiveCategoryFilter(e.target.value)}
-                className="select select-bordered w-full"
+                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="all">{UI_TEXT.clothing.allCategories}</option>
                 {categories.map((category) => (

@@ -13,6 +13,7 @@ export function PersonDetail({ person, clothing, onBack, onAddClothing, onEditCl
   const counts = useMemo(() => ({
     total: clothing.length,
     vorhanden: clothing.filter((item) => item.status === 'vorhanden').length,
+    zu_gross: clothing.filter((item) => item.status === 'zu_gross').length,
     zu_klein: clothing.filter((item) => item.status === 'zu_klein').length,
     aussortiert: clothing.filter((item) => item.status === 'aussortiert').length
   }), [clothing])
@@ -28,13 +29,13 @@ export function PersonDetail({ person, clothing, onBack, onAddClothing, onEditCl
   const IconComponent = Icons[person.avatar] || Icons.User
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors mb-4"
+            className="bg-secondary border-2 border-secondary-dark text-secondary-dark hover:bg-secondary/80 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium mb-4"
           >
             <ArrowLeft size={20} />
             {UI_TEXT.clothing.backToDashboard}
@@ -61,7 +62,7 @@ export function PersonDetail({ person, clothing, onBack, onAddClothing, onEditCl
 
               <button
                 onClick={onAddClothing}
-                className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium shadow-sm"
+                className="bg-primary hover:bg-primary/90 text-primary-light px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium shadow-sm"
               >
                 <Plus size={20} />
                 <span className="hidden sm:inline">{UI_TEXT.clothing.addClothing}</span>

@@ -5,8 +5,9 @@ import { ImageUpload } from './ImageUpload'
 import { UI_TEXT } from '../constants/uiText'
 import { CLOTHING_STATUSES } from '../constants/clothingStatuses'
 
-export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
+export function ClothingForm({ mode, clothing, personId, persons, onSave, onCancel }) {
   const [formData, setFormData] = useState({
+    personId: personId || clothing?.personId || '',
     kategorie: clothing?.kategorie || '',
     groesse: clothing?.groesse || '',
     status: clothing?.status || 'vorhanden',
@@ -17,6 +18,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
   const [error, setError] = useState('')
   const [imageFile, setImageFile] = useState(null)
   const [imageError, setImageError] = useState('')
+  const showPersonSelect = !personId && persons && persons.length > 0
 
   // Cleanup blob URLs on unmount
   useEffect(() => {
@@ -29,6 +31,11 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    if (showPersonSelect && !formData.personId) {
+      setError(UI_TEXT.clothing.personRequired)
+      return
+    }
 
     if (!formData.kategorie || formData.kategorie === 'Andere...') {
       setError(UI_TEXT.clothing.categoryRequired)
@@ -58,13 +65,13 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800">
+        <div className="sticky top-0 bg-white border-b-2 border-primary px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-primary">
             {mode === 'addClothing' ? UI_TEXT.clothing.addClothing : UI_TEXT.clothing.editClothing}
           </h2>
           <button
             onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-primary hover:text-primary/70 transition-colors"
             aria-label={UI_TEXT.cancel}
           >
             <X size={24} />
@@ -72,8 +79,29 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {showPersonSelect && (
+            <div>
+              <label htmlFor="personId" className="block text-sm font-medium text-primary mb-1">
+                {UI_TEXT.clothing.selectPerson} *
+              </label>
+              <select
+                id="personId"
+                value={formData.personId}
+                onChange={(e) => handleChange('personId', e.target.value)}
+                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="">{UI_TEXT.clothing.selectPerson}...</option>
+                {persons.map((person) => (
+                  <option key={person.id} value={person.id}>
+                    {person.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div>
-            <label htmlFor="kategorie" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="kategorie" className="block text-sm font-medium text-primary mb-1">
               {UI_TEXT.clothing.category} *
             </label>
             <CategorySelect
@@ -86,7 +114,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
           </div>
 
           <div>
-            <label htmlFor="groesse" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="groesse" className="block text-sm font-medium text-primary mb-1">
               {UI_TEXT.clothing.size}
             </label>
             <input
@@ -100,7 +128,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
           </div>
 
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="status" className="block text-sm font-medium text-primary mb-1">
               {UI_TEXT.clothing.status}
             </label>
             <select
@@ -118,7 +146,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
           </div>
 
           <div>
-            <label htmlFor="notizen" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="notizen" className="block text-sm font-medium text-primary mb-1">
               {UI_TEXT.clothing.notes}
             </label>
             <textarea
@@ -132,7 +160,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-primary mb-1">
               {UI_TEXT.clothing.image}
             </label>
             <ImageUpload
@@ -149,13 +177,13 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 bg-secondary border-2 border-secondary-dark text-secondary-dark hover:bg-secondary/80 rounded-md transition-colors font-medium"
             >
               {UI_TEXT.cancel}
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors font-medium"
+              className="flex-1 px-4 py-2 bg-primary text-primary-light rounded-md hover:bg-primary/90 transition-colors font-medium"
             >
               {UI_TEXT.save}
             </button>

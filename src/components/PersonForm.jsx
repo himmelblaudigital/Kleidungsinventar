@@ -32,13 +32,13 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800">
+        <div className="sticky top-0 bg-white border-b-2 border-primary px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-primary">
             {mode === 'add' ? UI_TEXT.addPerson : UI_TEXT.editPerson}
           </h2>
           <button
             onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-primary hover:text-primary/70 transition-colors"
             aria-label={UI_TEXT.cancel}
           >
             <X size={24} />
@@ -47,7 +47,7 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-primary mb-1">
               {UI_TEXT.name} *
             </label>
             <input
@@ -65,7 +65,7 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
           </div>
 
           <div>
-            <label htmlFor="kategorie" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="kategorie" className="block text-sm font-medium text-primary mb-1">
               {UI_TEXT.category}
             </label>
             <select
@@ -83,7 +83,7 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
           </div>
 
           <div>
-            <label htmlFor="groesse" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="groesse" className="block text-sm font-medium text-primary mb-1">
               {UI_TEXT.size}
             </label>
             <input
@@ -105,13 +105,13 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 bg-secondary border-2 border-secondary-dark text-secondary-dark hover:bg-secondary/80 rounded-md transition-colors font-medium"
             >
               {UI_TEXT.cancel}
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors font-medium"
+              className="flex-1 px-4 py-2 bg-primary text-primary-light rounded-md hover:bg-primary/90 transition-colors font-medium"
             >
               {UI_TEXT.save}
             </button>
