@@ -32,3 +32,8 @@ dist-ssr
 .firebase/
 firebase-debug.log
 firestore-debug.log
+
+# Screenshots
+Bildschirmfoto*.png
+Screenshot*.png
+*.png
