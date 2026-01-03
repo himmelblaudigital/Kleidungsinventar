@@ -19,7 +19,7 @@ export function CategorySelect({ value, onChange }) {
       <select
         value={isCustom ? 'Andere...' : value || ''}
         onChange={handleSelectChange}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
       >
         <option value="">Kategorie wählen...</option>
         {CLOTHING_CATEGORIES.map((cat) => (
@@ -35,7 +35,7 @@ export function CategorySelect({ value, onChange }) {
           value={isCustom ? value : ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder={UI_TEXT.clothing.customCategory}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           autoFocus
         />
       )}

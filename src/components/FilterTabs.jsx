@@ -9,21 +9,15 @@ export function FilterTabs({ activeFilter, counts, onChange }) {
   ]
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2">
+    <div className="tabs tabs-boxed bg-base-100 shadow">
       {filters.map((filter) => (
         <button
           key={filter.key}
           onClick={() => onChange(filter.key)}
-          className={`
-            flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-colors
-            ${
-              activeFilter === filter.key
-                ? 'bg-blue-500 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }
-          `}
+          className={`tab gap-2 ${activeFilter === filter.key ? 'tab-active' : ''}`}
         >
-          {filter.label} ({filter.count})
+          {filter.label}
+          <span className="badge badge-sm">{filter.count}</span>
         </button>
       ))}
     </div>

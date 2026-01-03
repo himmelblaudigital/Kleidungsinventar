@@ -55,7 +55,7 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
               id="name"
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder={UI_TEXT.name}
               autoFocus
             />
@@ -72,7 +72,7 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
               id="kategorie"
               value={formData.kategorie}
               onChange={(e) => handleChange('kategorie', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat.value} value={cat.value}>
@@ -91,7 +91,7 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
               id="groesse"
               value={formData.groesse}
               onChange={(e) => handleChange('groesse', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="z.B. 122cm, M, 38"
             />
           </div>
@@ -111,7 +111,7 @@ export function PersonForm({ mode, person, onSave, onCancel }) {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              className="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors font-medium"
             >
               {UI_TEXT.save}
             </button>

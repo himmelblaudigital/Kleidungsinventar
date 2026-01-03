@@ -7,6 +7,14 @@ export const CLOTHING_STATUSES = {
     borderColor: 'border-green-300',
     hoverBg: 'hover:bg-green-200'
   },
+  zu_gross: {
+    label: 'Noch zu groß',
+    color: 'blue',
+    bgColor: 'bg-blue-100',
+    textColor: 'text-blue-700',
+    borderColor: 'border-blue-300',
+    hoverBg: 'hover:bg-blue-200'
+  },
   zu_klein: {
     label: 'Zu klein',
     color: 'orange',

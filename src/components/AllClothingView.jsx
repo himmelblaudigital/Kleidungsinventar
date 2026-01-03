@@ -56,53 +56,20 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
     const IconComponent = Icons[person.avatar] || Icons.User
 
     return (
-      <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+      <div className="relative">
         {/* Person Badge */}
-        <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <IconComponent size={14} className="text-blue-600" />
-            </div>
-            <span className="text-sm font-medium text-gray-700">{person.name}</span>
-          </div>
+        <div className="absolute top-2 left-2 z-10 badge badge-primary gap-1">
+          <IconComponent size={12} />
+          <span className="text-xs">{person.name}</span>
         </div>
 
-        {/* Clothing Info */}
-        <div className="p-4">
-          <div className="mb-3">
-            <h3 className="text-lg font-semibold text-gray-800">{item.kategorie}</h3>
-            <div className="text-sm text-gray-600 space-y-1 mt-1">
-              {item.farbe && (
-                <p>
-                  <span className="font-medium">{UI_TEXT.clothing.color}:</span> {item.farbe}
-                </p>
-              )}
-              {item.marke && (
-                <p>
-                  <span className="font-medium">{UI_TEXT.clothing.brand}:</span> {item.marke}
-                </p>
-              )}
-              {item.groesse && (
-                <p>
-                  <span className="font-medium">{UI_TEXT.clothing.size}:</span> {item.groesse}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {item.notizen && (
-            <p className="text-sm text-gray-500 italic mb-3 border-t pt-2">
-              {item.notizen}
-            </p>
-          )}
-
-          <ClothingCard
-            item={item}
-            onStatusChange={onStatusChange}
-            onEdit={onEditClothing}
-            onDelete={onDeleteClothing}
-          />
-        </div>
+        {/* Clothing Card */}
+        <ClothingCard
+          item={item}
+          onStatusChange={onStatusChange}
+          onEdit={onEditClothing}
+          onDelete={onDeleteClothing}
+        />
       </div>
     )
   }
@@ -114,19 +81,21 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 transition-colors"
+            className="btn btn-ghost gap-2 mb-4"
           >
             <ArrowLeft size={20} />
             {UI_TEXT.clothing.backToDashboard}
           </button>
 
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-              {UI_TEXT.clothing.allClothing}
-            </h1>
-            <p className="text-gray-600">
-              {clothing.length} {UI_TEXT.clothing.items} insgesamt
-            </p>
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h1 className="card-title text-2xl md:text-3xl">
+                {UI_TEXT.clothing.allClothing}
+              </h1>
+              <p className="opacity-70">
+                {clothing.length} {UI_TEXT.clothing.items} insgesamt
+              </p>
+            </div>
           </div>
         </div>
 
@@ -144,14 +113,14 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
           {/* Person and Category Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Person Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {UI_TEXT.clothing.filterByPerson}
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text font-medium">{UI_TEXT.clothing.filterByPerson}</span>
               </label>
               <select
                 value={activePersonFilter}
                 onChange={(e) => setActivePersonFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="select select-bordered w-full"
               >
                 <option value="all">{UI_TEXT.clothing.allPersons}</option>
                 {persons.map((person) => (
@@ -163,14 +132,14 @@ export function AllClothingView({ persons, clothing, onBack, onEditClothing, onD
             </div>
 
             {/* Category Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {UI_TEXT.clothing.filterByCategory}
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text font-medium">{UI_TEXT.clothing.filterByCategory}</span>
               </label>
               <select
                 value={activeCategoryFilter}
                 onChange={(e) => setActiveCategoryFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="select select-bordered w-full"
               >
                 <option value="all">{UI_TEXT.clothing.allCategories}</option>
                 {categories.map((category) => (

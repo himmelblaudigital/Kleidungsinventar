@@ -34,7 +34,7 @@ export function PersonDetail({ person, clothing, onBack, onAddClothing, onEditCl
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 transition-colors"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors mb-4"
           >
             <ArrowLeft size={20} />
             {UI_TEXT.clothing.backToDashboard}
@@ -43,8 +43,10 @@ export function PersonDetail({ person, clothing, onBack, onAddClothing, onEditCl
           <div className="bg-white rounded-lg shadow-md p-6 mb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <IconComponent size={32} className="text-blue-600" />
+                <div className="flex-shrink-0">
+                  <div className="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center">
+                    <IconComponent size={32} />
+                  </div>
                 </div>
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
@@ -59,7 +61,7 @@ export function PersonDetail({ person, clothing, onBack, onAddClothing, onEditCl
 
               <button
                 onClick={onAddClothing}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-md hover:shadow-lg"
+                className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium shadow-sm"
               >
                 <Plus size={20} />
                 <span className="hidden sm:inline">{UI_TEXT.clothing.addClothing}</span>

@@ -10,17 +10,17 @@ export function Toast({ message, type = 'success', onClose }) {
     return () => clearTimeout(timer)
   }, [onClose])
 
-  const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  const alertClass = type === 'success' ? 'alert-success' : 'alert-error'
   const Icon = type === 'success' ? Check : X
 
   return (
-    <div className="fixed top-4 right-4 z-50 animate-slide-in">
-      <div className={`${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]`}>
-        <Icon className="w-5 h-5 flex-shrink-0" />
-        <p className="flex-1">{message}</p>
+    <div className="toast toast-top toast-end z-50">
+      <div className={`alert ${alertClass} shadow-lg animate-slide-in`}>
+        <Icon className="w-5 h-5" />
+        <span>{message}</span>
         <button
           onClick={onClose}
-          className="hover:bg-white/20 rounded p-1 transition-colors"
+          className="btn btn-sm btn-circle btn-ghost"
         >
           <X className="w-4 h-4" />
         </button>

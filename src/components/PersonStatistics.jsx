@@ -6,25 +6,28 @@ export function PersonStatistics({ clothing }) {
   const aussortiert = clothing.filter((item) => item.status === 'aussortiert').length
 
   return (
-    <div className="bg-blue-50 rounded-lg p-4 mb-6">
-      <div className="flex flex-wrap gap-4 text-sm">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-700">Gesamt:</span>
-          <span className="text-blue-700 font-bold">{total} {UI_TEXT.clothing.items}</span>
-        </div>
-        {zuKlein > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-orange-500" />
-            <span className="text-gray-700">{zuKlein} {UI_TEXT.clothing.itemsToSmall}</span>
-          </div>
-        )}
-        {aussortiert > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500" />
-            <span className="text-gray-700">{aussortiert} {UI_TEXT.clothing.itemsSorted}</span>
-          </div>
-        )}
+    <div className="stats shadow bg-base-100 mb-6">
+      <div className="stat">
+        <div className="stat-title">Gesamt</div>
+        <div className="stat-value text-primary text-2xl">{total}</div>
+        <div className="stat-desc">{UI_TEXT.clothing.items}</div>
       </div>
+
+      {zuKlein > 0 && (
+        <div className="stat">
+          <div className="stat-title">Zu klein</div>
+          <div className="stat-value text-warning text-2xl">{zuKlein}</div>
+          <div className="stat-desc">{UI_TEXT.clothing.itemsToSmall}</div>
+        </div>
+      )}
+
+      {aussortiert > 0 && (
+        <div className="stat">
+          <div className="stat-title">Aussortiert</div>
+          <div className="stat-value text-error text-2xl">{aussortiert}</div>
+          <div className="stat-desc">{UI_TEXT.clothing.itemsSorted}</div>
+        </div>
+      )}
     </div>
   )
 }

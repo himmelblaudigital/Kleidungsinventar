@@ -8,8 +8,6 @@ import { CLOTHING_STATUSES } from '../constants/clothingStatuses'
 export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
   const [formData, setFormData] = useState({
     kategorie: clothing?.kategorie || '',
-    farbe: clothing?.farbe || '',
-    marke: clothing?.marke || '',
     groesse: clothing?.groesse || '',
     status: clothing?.status || 'vorhanden',
     notizen: clothing?.notizen || '',
@@ -75,7 +73,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="kategorie" className="block text-sm font-medium text-gray-700 mb-1">
               {UI_TEXT.clothing.category} *
             </label>
             <CategorySelect
@@ -88,34 +86,6 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
           </div>
 
           <div>
-            <label htmlFor="farbe" className="block text-sm font-medium text-gray-700 mb-1">
-              {UI_TEXT.clothing.color}
-            </label>
-            <input
-              type="text"
-              id="farbe"
-              value={formData.farbe}
-              onChange={(e) => handleChange('farbe', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="z.B. Blau, Rot, Grün"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="marke" className="block text-sm font-medium text-gray-700 mb-1">
-              {UI_TEXT.clothing.brand}
-            </label>
-            <input
-              type="text"
-              id="marke"
-              value={formData.marke}
-              onChange={(e) => handleChange('marke', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="z.B. Nike, Adidas"
-            />
-          </div>
-
-          <div>
             <label htmlFor="groesse" className="block text-sm font-medium text-gray-700 mb-1">
               {UI_TEXT.clothing.size}
             </label>
@@ -124,7 +94,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
               id="groesse"
               value={formData.groesse}
               onChange={(e) => handleChange('groesse', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="z.B. 122cm, M, 38"
             />
           </div>
@@ -137,7 +107,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
               id="status"
               value={formData.status}
               onChange={(e) => handleChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             >
               {Object.entries(CLOTHING_STATUSES).map(([statusKey, config]) => (
                 <option key={statusKey} value={statusKey}>
@@ -156,7 +126,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
               value={formData.notizen}
               onChange={(e) => handleChange('notizen', e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Optionale Notizen..."
             />
           </div>
@@ -172,9 +142,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
               disabled={false}
               error={imageError}
             />
-            <p className="mt-1 text-sm text-gray-500">
-              {UI_TEXT.clothing.imageOptional}
-            </p>
+            <p className="mt-1 text-sm text-gray-500">{UI_TEXT.clothing.imageOptional}</p>
           </div>
 
           <div className="flex gap-3 pt-4">
@@ -187,7 +155,7 @@ export function ClothingForm({ mode, clothing, personId, onSave, onCancel }) {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              className="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors font-medium"
             >
               {UI_TEXT.save}
             </button>

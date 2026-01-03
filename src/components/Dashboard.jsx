@@ -13,14 +13,14 @@ export function Dashboard({ persons, onAddClick, onEditClick, onDeleteClick, onV
           <div className="flex gap-2">
             <button
               onClick={onViewAllClothing}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-md hover:shadow-lg"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
             >
               <Package size={20} />
               <span className="hidden sm:inline">{UI_TEXT.clothing.allClothing}</span>
             </button>
             <button
               onClick={onAddClick}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-md hover:shadow-lg"
+              className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium shadow-sm"
             >
               <Plus size={20} />
               <span>{UI_TEXT.addPerson}</span>
