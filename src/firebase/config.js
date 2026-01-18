@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore, initializeFirestore, CACHE_SIZE_UNLIMITED } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
+import { getAuth } from 'firebase/auth'
 
 // Firebase configuration
 const firebaseConfig = {
@@ -16,8 +17,16 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
 
-// Initialize Firestore
-export const db = getFirestore(app)
+// Initialize Firestore with explicit settings for mobile compatibility
+// Disable experimental features that can cause issues on mobile browsers
+export const db = initializeFirestore(app, {
+  cacheSizeBytes: CACHE_SIZE_UNLIMITED,
+  experimentalForceLongPolling: true,  // Better compatibility with mobile browsers
+  ignoreUndefinedProperties: true
+})
 
 // Initialize Storage
 export const storage = getStorage(app)
+
+// Initialize Authentication
+export const auth = getAuth(app)

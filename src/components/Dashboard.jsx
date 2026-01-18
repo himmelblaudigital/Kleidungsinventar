@@ -1,8 +1,8 @@
-import { Plus, Package } from 'lucide-react'
+import { Plus, Package, LogOut } from 'lucide-react'
 import { PersonCard } from './PersonCard'
 import { UI_TEXT } from '../constants/uiText'
 
-export function Dashboard({ persons, onAddClick, onEditClick, onDeleteClick, onViewClothing, onViewAllClothing, onQuickAddClothing }) {
+export function Dashboard({ persons, onAddClick, onEditClick, onDeleteClick, onViewClothing, onViewAllClothing, onQuickAddClothing, onLogout }) {
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
@@ -33,6 +33,14 @@ export function Dashboard({ persons, onAddClick, onEditClick, onDeleteClick, onV
             >
               <Plus size={20} />
               <span>{UI_TEXT.addPerson}</span>
+            </button>
+            <button
+              onClick={onLogout}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium"
+              title="Abmelden"
+            >
+              <LogOut size={20} />
+              <span className="hidden md:inline">Abmelden</span>
             </button>
           </div>
         </header>

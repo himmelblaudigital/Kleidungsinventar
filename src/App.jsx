@@ -1,16 +1,22 @@
 import { useState } from 'react'
 import { useFirestoreCollection } from './hooks/useFirestoreCollection'
+import { useAuth } from './hooks/useAuth'
 import { uploadClothingImage, deleteClothingImage } from './firebase/storage'
 import { Dashboard } from './components/Dashboard'
 import { PersonForm } from './components/PersonForm'
 import { ConfirmDialog } from './components/ConfirmDialog'
+import { ClothingConfirmDialog } from './components/ClothingConfirmDialog'
 import { PersonDetail } from './components/PersonDetail'
 import { ClothingForm } from './components/ClothingForm'
 import { AllClothingView } from './components/AllClothingView'
 import { Toast } from './components/Toast'
+import { Login } from './components/Login'
 import { UI_TEXT } from './constants/uiText'
 
 function App() {
+  // Authentication
+  const { user, loading: authLoading, error: authError, signIn, signOut, isAuthenticated } = useAuth()
+
   // Firestore collections with real-time sync
   const personsCollection = useFirestoreCollection('persons')
   const clothingCollection = useFirestoreCollection('clothing')
@@ -19,6 +25,7 @@ function App() {
   const [currentView, setCurrentView] = useState('dashboard')
   const [editingPerson, setEditingPerson] = useState(null)
   const [deleteConfirmPerson, setDeleteConfirmPerson] = useState(null)
+  const [deleteConfirmClothing, setDeleteConfirmClothing] = useState(null)
   const [selectedPerson, setSelectedPerson] = useState(null)
   const [editingClothing, setEditingClothing] = useState(null)
 
@@ -30,12 +37,29 @@ function App() {
   const clothing = clothingCollection.data
   const loading = personsCollection.loading || clothingCollection.loading
 
+  // Show loading screen while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Laden...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <Login onSignIn={signIn} error={authError} loading={authLoading} />
+  }
+
   // Show loading screen while data is being fetched
   if (loading && persons.length === 0 && clothing.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Laden...</p>
         </div>
       </div>
@@ -201,7 +225,11 @@ function App() {
     }
   }
 
-  const handleDeleteClothing = async (item) => {
+  const handleDeleteClothing = (item) => {
+    setDeleteConfirmClothing(item)
+  }
+
+  const handleConfirmDeleteClothing = async (item) => {
     try {
       // Delete image from Storage if exists
       if (item.imagePath) {
@@ -211,10 +239,16 @@ function App() {
       // Delete Firestore document
       await clothingCollection.deleteItem(item.id)
       setToast({ message: UI_TEXT.clothing.clothingDeleted, type: 'success' })
+      setDeleteConfirmClothing(null)
     } catch (error) {
       console.error('Error deleting clothing:', error)
       setToast({ message: 'Fehler beim Löschen des Kleidungsstücks', type: 'error' })
+      setDeleteConfirmClothing(null)
     }
+  }
+
+  const handleCancelDeleteClothing = () => {
+    setDeleteConfirmClothing(null)
   }
 
   const handleStatusChange = async (itemId, newStatus) => {
@@ -241,6 +275,15 @@ function App() {
     setCurrentView('allClothing')
   }
 
+  const handleLogout = async () => {
+    const result = await signOut()
+    if (result.success) {
+      setToast({ message: 'Erfolgreich abgemeldet', type: 'success' })
+    } else {
+      setToast({ message: result.error, type: 'error' })
+    }
+  }
+
   return (
     <>
       {toast && (
@@ -260,6 +303,7 @@ function App() {
           onViewClothing={handleViewClothing}
           onViewAllClothing={handleViewAllClothing}
           onQuickAddClothing={handleQuickAddClothing}
+          onLogout={handleLogout}
         />
       )}
 
@@ -322,6 +366,14 @@ function App() {
           person={deleteConfirmPerson}
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
+        />
+      )}
+
+      {deleteConfirmClothing && (
+        <ClothingConfirmDialog
+          item={deleteConfirmClothing}
+          onConfirm={handleConfirmDeleteClothing}
+          onCancel={handleCancelDeleteClothing}
         />
       )}
     </>

@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ===================================================================
+    // SICHERE REGELN MIT AUTHENTIFIZIERUNG
+    // Nur angemeldete Benutzer haben Zugriff auf Bilder
+    // ===================================================================
+
+    match /clothing/{personId}/{clothingId}/{fileName} {
+      // Lesen: Nur für authentifizierte Benutzer
+      allow read: if request.auth != null;
+
+      // Schreiben: Nur für authentifizierte Benutzer mit Validierung
+      allow write: if request.auth != null
+        && request.resource != null
+        // Nur Bilder
+        && request.resource.contentType.matches('image/.*')
+        // Max 5MB
+        && request.resource.size < 5 * 1024 * 1024
+        // Nur erlaubte Bildformate
+        && request.resource.contentType in [
+          'image/jpeg',
+          'image/jpg',
+          'image/png',
+          'image/gif',
+          'image/webp'
+        ]
+        // Dateiname muss 'image' enthalten und korrekte Endung haben
+        && fileName.matches('image\\.(jpg|jpeg|png|gif|webp)');
+
+      // Löschen: Nur für authentifizierte Benutzer
+      allow delete: if request.auth != null;
+    }
+
+    // Alle anderen Pfade: Blockiert
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,179 @@
+# Apache Configuration für Kleidungsinventar React App
+# Diese Datei wird automatisch von Vite in den dist/ Ordner kopiert
+
+<IfModule mod_rewrite.c>
+  # Rewrite Engine aktivieren
+  RewriteEngine On
+
+  # Basis-Pfad setzen (anpassen falls App in Unterordner liegt)
+  RewriteBase /
+
+  # ===================================================================
+  # HTTPS-Weiterleitung (Optional - aktivieren falls gewünscht)
+  # ===================================================================
+  # Kommentiere die folgenden Zeilen ein, um HTTP automatisch auf HTTPS umzuleiten:
+  # RewriteCond %{HTTPS} off
+  # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # ===================================================================
+  # SPA-Routing: Alle Anfragen auf index.html umleiten
+  # ===================================================================
+  # Wenn die Anfrage KEINE existierende Datei ist
+  RewriteCond %{REQUEST_FILENAME} !-f
+  # Und KEIN existierender Ordner ist
+  RewriteCond %{REQUEST_FILENAME} !-d
+  # Dann leite auf index.html um (wichtig für React Router)
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# ===================================================================
+# Gzip-Kompression für bessere Performance
+# ===================================================================
+<IfModule mod_deflate.c>
+  # Komprimiere HTML, CSS, JavaScript, JSON, XML
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/atom_xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+
+  # Komprimiere Schriftarten
+  AddOutputFilterByType DEFLATE font/truetype
+  AddOutputFilterByType DEFLATE font/opentype
+  AddOutputFilterByType DEFLATE application/x-font-ttf
+  AddOutputFilterByType DEFLATE application/x-font-woff
+  AddOutputFilterByType DEFLATE application/font-woff
+  AddOutputFilterByType DEFLATE application/font-woff2
+</IfModule>
+
+# ===================================================================
+# Browser-Caching für statische Dateien
+# ===================================================================
+<IfModule mod_expires.c>
+  # Caching aktivieren
+  ExpiresActive On
+
+  # Standard: 1 Monat
+  ExpiresDefault "access plus 1 month"
+
+  # HTML: Kein Caching (damit Updates sofort sichtbar sind)
+  ExpiresByType text/html "access plus 0 seconds"
+
+  # CSS und JavaScript: 1 Jahr (wegen Hash im Dateinamen)
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType application/x-javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+
+  # Bilder: 1 Jahr
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresByType image/vnd.microsoft.icon "access plus 1 year"
+
+  # Schriftarten: 1 Jahr
+  ExpiresByType font/ttf "access plus 1 year"
+  ExpiresByType font/otf "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType application/font-woff "access plus 1 year"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+  ExpiresByType application/x-font-woff "access plus 1 year"
+  ExpiresByType application/x-font-ttf "access plus 1 year"
+</IfModule>
+
+# Alternative Cache-Control Header (falls mod_expires nicht verfügbar)
+<IfModule mod_headers.c>
+  # CSS, JS, Bilder, Schriftarten: 1 Jahr cachen
+  <FilesMatch "\.(css|js|jpg|jpeg|png|gif|svg|ico|webp|woff|woff2|ttf|otf|eot)$">
+    Header set Cache-Control "max-age=31536000, public, immutable"
+  </FilesMatch>
+
+  # HTML: Nicht cachen
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
+
+# ===================================================================
+# Sicherheits-Header
+# ===================================================================
+<IfModule mod_headers.c>
+  # Verhindert Clickjacking-Angriffe
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Verhindert MIME-Type Sniffing
+  Header always set X-Content-Type-Options "nosniff"
+
+  # XSS-Schutz aktivieren
+  Header always set X-XSS-Protection "1; mode=block"
+
+  # Referrer Policy
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Content Security Policy (CSP) - Anpassen nach Bedarf
+  # Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://firebasestorage.googleapis.com; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net; frame-src https://kleidungsinventar.firebaseapp.com;"
+</IfModule>
+
+# ===================================================================
+# MIME-Types korrekt setzen (falls Server sie nicht kennt)
+# ===================================================================
+<IfModule mod_mime.c>
+  # JavaScript
+  AddType application/javascript js mjs
+  AddType application/json json
+
+  # Schriftarten
+  AddType font/woff woff
+  AddType font/woff2 woff2
+  AddType font/ttf ttf
+  AddType font/otf otf
+  AddType application/font-woff woff
+  AddType application/font-woff2 woff2
+
+  # Bilder
+  AddType image/svg+xml svg svgz
+  AddType image/webp webp
+
+  # Manifest
+  AddType application/manifest+json webmanifest
+</IfModule>
+
+# ===================================================================
+# Dateizugriff beschränken
+# ===================================================================
+# Verhindere direkten Zugriff auf sensible Dateien
+<FilesMatch "(^\.htaccess|^\.git|^\.env|\.config\.js$|package\.json$|package-lock\.json$)">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# ===================================================================
+# Performance: ETags deaktivieren (wenn Expires-Header gesetzt sind)
+# ===================================================================
+<IfModule mod_headers.c>
+  Header unset ETag
+</IfModule>
+FileETag None
+
+# ===================================================================
+# Zeichenkodierung
+# ===================================================================
+AddDefaultCharset utf-8
+<IfModule mod_mime.c>
+  AddCharset utf-8 .html .css .js .json .xml .svg
+</IfModule>
