@@ -3,9 +3,13 @@
 // config.php ist in .gitignore und wird NICHT ins Repository übernommen.
 
 return [
-    // dogado MySQL-Zugangsdaten (siehe dogado-Kundencenter -> Datenbanken)
+    // dogado MySQL-Zugangsdaten (siehe dogado-Kundencenter -> Datenbanken -> "Verbindungsdetails").
+    // WICHTIG: Trage Host/Port exakt so ein, wie dogado sie anzeigt (z.B. "127.0.0.1" + Port "3307").
+    // Bei Host = "localhost" (Wortlaut) verbindet sich PHP per Unix-Socket und ignoriert den Port –
+    // gib bei einem abweichenden Port daher die IP "127.0.0.1" statt "localhost" an.
     'db' => [
-        'host' => 'localhost',
+        'host' => '127.0.0.1',
+        'port' => 3306,
         'name' => 'dbXXXXXXXXX',
         'user' => 'dbXXXXXXXXX',
         'pass' => 'CHANGE_ME',
