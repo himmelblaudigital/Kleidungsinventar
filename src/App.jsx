@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useFirestoreCollection } from './hooks/useFirestoreCollection'
+import { useApiCollection } from './hooks/useApiCollection'
 import { useAuth } from './hooks/useAuth'
-import { uploadClothingImage, deleteClothingImage } from './firebase/storage'
+import { uploadClothingImage, deleteClothingImage } from './api/images'
 import { Dashboard } from './components/Dashboard'
 import { PersonForm } from './components/PersonForm'
 import { ConfirmDialog } from './components/ConfirmDialog'
@@ -17,9 +17,9 @@ function App() {
   // Authentication
   const { user, loading: authLoading, error: authError, signIn, signOut, isAuthenticated } = useAuth()
 
-  // Firestore collections with real-time sync
-  const personsCollection = useFirestoreCollection('persons')
-  const clothingCollection = useFirestoreCollection('clothing')
+  // MySQL-backed collections via PHP-API
+  const personsCollection = useApiCollection('persons')
+  const clothingCollection = useApiCollection('clothing')
 
   // View management state
   const [currentView, setCurrentView] = useState('dashboard')
@@ -32,7 +32,7 @@ function App() {
   // Toast notification state
   const [toast, setToast] = useState(null)
 
-  // Extract data from Firestore hooks
+  // Extract data from API hooks
   const persons = personsCollection.data
   const clothing = clothingCollection.data
   const loading = personsCollection.loading || clothingCollection.loading
@@ -113,7 +113,7 @@ function App() {
         if (item.imagePath) {
           await deleteClothingImage(item.imagePath)
         }
-        // Delete Firestore document
+        // Delete database record
         await clothingCollection.deleteItem(item.id)
       }))
 
@@ -157,7 +157,7 @@ function App() {
       const targetPersonId = formData.personId || selectedPerson?.id
 
       if (currentView === 'addClothing' || currentView === 'quickAddClothing') {
-        // Create Firestore document first to get the ID
+        // Create database record first to get the ID
         const newItem = {
           personId: targetPersonId,
           ...formData,
@@ -236,7 +236,7 @@ function App() {
         await deleteClothingImage(item.imagePath)
       }
 
-      // Delete Firestore document
+      // Delete database record
       await clothingCollection.deleteItem(item.id)
       setToast({ message: UI_TEXT.clothing.clothingDeleted, type: 'success' })
       setDeleteConfirmClothing(null)
