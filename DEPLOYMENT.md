@@ -1,13 +1,14 @@
-# Deployment-Anleitung für eigenen Server
+# Deployment-Anleitung (dogado / eigener Server mit PHP + MySQL)
 
-Diese Anleitung zeigt, wie du die Kleidungsinventar-App auf deinem eigenen Webserver bereitstellst.
+Diese Anleitung zeigt, wie du die Kleidungsinventar-App auf einem Webserver mit PHP und MySQL (z.B. dogado Webhosting) bereitstellst. Das React-Frontend läuft als statischer Build, die Daten liegen in MySQL und werden über die mitgelieferte PHP-API (`api/`) angesprochen.
 
 ## Voraussetzungen
 
-- Node.js (v18 oder höher) auf deinem lokalen Rechner
-- Zugriff auf deinen Webserver (SSH, FTP, oder Web-Interface)
-- Webserver mit nginx, Apache oder ähnlich
-- Firebase Authentication & Security Rules bereits eingerichtet (siehe SETUP_AUTH.md)
+- Node.js (v18 oder höher) auf deinem lokalen Rechner, um das Frontend zu bauen
+- dogado-Hosting-Paket (oder anderer Webhoster) mit **PHP 8.x** und **MySQL**
+- Zugriff auf deinen Webserver (SSH/SFTP oder das dogado-Kundencenter)
+- MySQL-Datenbank in dogado angelegt (Zugangsdaten aus dem Kundencenter)
+- Login-Benutzer bereits eingerichtet (siehe SETUP_AUTH.md)
 
 ## Schritt 1: App lokal bauen
 
@@ -33,27 +34,40 @@ npm run preview
 
 Die App läuft dann auf http://localhost:4173
 
-## Schritt 2: Dateien auf den Server hochladen
+## Schritt 2: MySQL-Datenbank einrichten
+
+1. Lege in dogado eine MySQL-Datenbank an (falls noch nicht geschehen) und notiere Host, Datenbankname, Benutzer und Passwort
+2. Importiere das Schema per phpMyAdmin oder CLI:
+   ```bash
+   mysql -u DEIN_DB_USER -p DEIN_DB_NAME < db/schema.sql
+   ```
+3. Lege den ersten Benutzer an – siehe SETUP_AUTH.md
+
+## Schritt 3: Dateien auf den Server hochladen
+
+Es müssen **zwei Teile** hochgeladen werden: der statische Frontend-Build (`dist/`) und der PHP-Ordner (`api/`).
 
 ### Option A: Via SSH/SCP
 
 ```bash
-# Gesamten dist Ordner hochladen
-scp -r dist/* user@dein-server.de:/var/www/kleidungsinventar/
-
-# Oder mit rsync (empfohlen, da effizienter)
+# Frontend-Build hochladen
 rsync -avz --delete dist/ user@dein-server.de:/var/www/kleidungsinventar/
+
+# PHP-API hochladen (api/config.php wird separat/manuell angelegt, siehe unten)
+rsync -avz --exclude 'config.php' --exclude 'uploads/*' api/ user@dein-server.de:/var/www/kleidungsinventar/api/
 ```
 
 ### Option B: Via FTP/SFTP
 
 1. Verbinde dich mit deinem FTP-Client (z.B. FileZilla)
 2. Lade **alle Dateien** aus dem `dist/` Ordner in dein Web-Verzeichnis hoch
-3. Achte darauf, dass die Ordnerstruktur erhalten bleibt
+3. Lade den kompletten `api/`-Ordner in ein Unterverzeichnis `api/` desselben Web-Verzeichnisses hoch (inkl. `.htaccess`-Dateien – FTP-Clients blenden versteckte Dateien manchmal aus, ggf. "versteckte Dateien anzeigen" aktivieren)
+4. Erstelle auf dem Server `api/config.php` (Kopie von `api/config.example.php` mit deinen dogado-MySQL-Zugangsdaten) – **niemals `api/config.example.php` mit echten Zugangsdaten committen/hochladen**
+5. Stelle sicher, dass `api/uploads/` beschreibbar ist (Rechte i.d.R. 755, je nach dogado-Konfiguration)
 
 ### Option C: Via Git + Server-Build
 
-Falls dein Server Node.js hat, kannst du auch direkt auf dem Server bauen:
+Falls dein Server Node.js hat, kannst du das Frontend auch direkt auf dem Server bauen:
 
 ```bash
 # Auf dem Server
@@ -61,10 +75,11 @@ cd /var/www/kleidungsinventar
 git pull
 npm install
 npm run build
-# Konfiguriere Webserver auf dist/ Ordner
+cp api/config.example.php api/config.php   # danach Zugangsdaten eintragen
+# Konfiguriere Webserver auf dist/ Ordner, api/ bleibt daneben erreichbar unter /api
 ```
 
-## Schritt 3: Webserver konfigurieren
+## Schritt 4: Webserver konfigurieren
 
 ### Für nginx
 
@@ -194,12 +209,15 @@ sudo a2ensite kleidungsinventar
 sudo systemctl restart apache2
 ```
 
-## Schritt 4: SSL/HTTPS einrichten (Wichtig!)
+**Hinweis zur PHP-API unter Apache:** Die SPA-Rewrite-Regel (`RewriteCond %{REQUEST_FILENAME} !-f`) greift nur, wenn die angefragte Datei nicht existiert. Da `api/*.php` echte Dateien sind, werden Anfragen an `/api/...` normal an PHP durchgereicht und nicht auf `index.html` umgeleitet – es ist keine zusätzliche Konfiguration nötig. Bei dogado ist PHP bereits aktiviert, ein eigenes vHost-Setup ist auf Shared Hosting i.d.R. nicht nötig/möglich (Domain wird im Kundencenter auf das Upload-Verzeichnis gelegt).
+
+## Schritt 5: SSL/HTTPS einrichten (Wichtig!)
 
 **Warum HTTPS wichtig ist:**
-- Firebase Authentication funktioniert nur über HTTPS (außer localhost)
+- Das Session-Cookie wird in Produktion als `Secure` markiert (`session_cookie_secure` in `api/config.php`) und damit nur über HTTPS übertragen
 - Schützt die Login-Daten deiner Familie
 - Moderne Browser verlangen HTTPS
+- dogado stellt für eigene Domains i.d.R. kostenlose SSL-Zertifikate bereit (Kundencenter → SSL)
 
 ### Mit Let's Encrypt (kostenlos)
 
@@ -231,7 +249,7 @@ Certbot richtet automatisch:
 - HTTP→HTTPS Weiterleitung
 - Automatische Verlängerung
 
-## Schritt 5: Domain und DNS konfigurieren
+## Schritt 6: Domain und DNS konfigurieren
 
 Stelle sicher, dass deine Domain auf deinen Server zeigt:
 
@@ -240,7 +258,7 @@ Stelle sicher, dass deine Domain auf deinen Server zeigt:
 
 Die DNS-Änderungen können 1-48 Stunden dauern.
 
-## Schritt 6: Testen
+## Schritt 7: Testen
 
 1. Öffne https://deine-domain.de im Browser
 2. Teste den Login
@@ -290,34 +308,33 @@ Nutzung: `chmod +x deploy.sh && ./deploy.sh`
 - nginx: `try_files $uri $uri/ /index.html;`
 - Apache: `.htaccess` mit RewriteRule
 
-### Problem: Firebase Auth funktioniert nicht
+### Problem: Login funktioniert nicht / "Nicht angemeldet" (401)
 
 **Mögliche Ursachen:**
-1. App läuft nicht über HTTPS
-2. Domain ist nicht in Firebase Console als autorisierte Domain eingetragen
+1. `api/config.php` fehlt oder enthält falsche MySQL-Zugangsdaten
+2. Kein Benutzer in der Tabelle `users` angelegt (siehe SETUP_AUTH.md)
+3. App läuft über HTTPS, aber `session_cookie_secure` in `api/config.php` steht noch auf `false` (Cookie wird dann evtl. nicht gesetzt) – oder umgekehrt: `true` gesetzt, aber App läuft (noch) über HTTP
 
 **Lösung:**
-- Stelle sicher, dass SSL/HTTPS konfiguriert ist
-- Gehe zu Firebase Console → Authentication → Settings → Authorized domains
-- Füge deine Domain hinzu (z.B. `deine-domain.de`)
+- Prüfe die Netzwerk-Anfrage an `api/auth/login.php` in den Browser-DevTools auf die genaue Fehlermeldung
+- Prüfe PHP-Error-Logs im dogado-Kundencenter
 
 ### Problem: Bilder werden nicht angezeigt
 
 **Mögliche Ursachen:**
-- CORS-Probleme
-- Benutzer nicht angemeldet
-- Storage Rules nicht deployed
+- `api/uploads/` ist nicht beschreibbar (falsche Dateirechte)
+- Benutzer nicht angemeldet (Upload-Endpunkt erfordert Login)
+- `api/` wurde nicht mit hochgeladen oder liegt am falschen Pfad
 
 **Lösung:**
 - Prüfe, ob du angemeldet bist
-- Deploye Storage Rules: `firebase deploy --only storage`
-- Prüfe Browser-Konsole auf Fehler
+- Prüfe Dateirechte von `api/uploads/` (i.d.R. 755)
+- Prüfe Browser-Konsole/Netzwerk-Tab auf Fehler bei `api/upload.php`
 
-### Problem: "Firebase: Error (auth/unauthorized-domain)"
+### Problem: "Server ist nicht konfiguriert" (500)
 
 **Lösung:**
-- Gehe zu Firebase Console → Authentication → Settings → Authorized domains
-- Füge deine Domain hinzu (ohne https://)
+- `api/config.php` fehlt auf dem Server – aus `api/config.example.php` kopieren und mit echten dogado-Zugangsdaten befüllen
 
 ## Automatisierung (Optional)
 
@@ -364,15 +381,15 @@ Füge in GitHub → Settings → Secrets die SSH-Keys hinzu.
 
 ## Checkliste vor Go-Live
 
+- [ ] MySQL-Datenbank angelegt und `db/schema.sql` importiert
 - [ ] App gebaut (`npm run build`)
-- [ ] Dateien auf Server hochgeladen
-- [ ] Webserver konfiguriert (nginx/Apache)
+- [ ] Frontend (`dist/`) und PHP-API (`api/`) auf Server hochgeladen
+- [ ] `api/config.php` mit dogado-MySQL-Zugangsdaten angelegt (nicht `config.example.php` verwenden)
+- [ ] `session_cookie_secure` auf `true` gesetzt, sobald HTTPS aktiv ist
+- [ ] `api/uploads/` beschreibbar
+- [ ] Erster Benutzer angelegt (siehe SETUP_AUTH.md), Setup-Skripte danach ggf. wieder entfernt
 - [ ] SSL/HTTPS eingerichtet
 - [ ] Domain-DNS konfiguriert
-- [ ] Firebase Authentication aktiviert
-- [ ] Benutzer in Firebase angelegt
-- [ ] Security Rules deployed (`firebase deploy --only firestore:rules,storage`)
-- [ ] Domain in Firebase Authorized Domains eingetragen
 - [ ] App getestet (Login, CRUD-Operationen, Bilder)
 - [ ] Browser-Cache geleert beim Testen
 
@@ -387,16 +404,18 @@ Füge in GitHub → Settings → Secrets die SSH-Keys hinzu.
 
 ✅ **Bereits implementiert:**
 - HTTPS/SSL
-- Firebase Authentication
-- Firestore Security Rules
-- Storage Security Rules
+- Eigenes Login (bcrypt-gehashte Passwörter, HttpOnly-Session-Cookie)
+- API-Endpunkte erfordern eine gültige Session (`require_auth()`)
+- Interne PHP-Dateien (`config.php`, `db.php`, `bootstrap.php`, …) per `.htaccess` vor direktem Zugriff geschützt
+- Hochgeladene Bilder können nicht als PHP ausgeführt werden
 - Sicherheits-Header (X-Frame-Options, etc.)
 
 ⚠️ **Zusätzliche Empfehlungen:**
 - Regelmäßige Updates von Dependencies: `npm audit`
-- Firewall auf dem Server konfigurieren
-- Fail2Ban für Brute-Force-Schutz
-- Regelmäßige Backups der Firebase-Daten
+- `api/setup/generate_password_hash.php` nach der Ersteinrichtung vom Server löschen
+- Firewall auf dem Server konfigurieren (falls eigener Server statt Shared Hosting)
+- Fail2Ban für Brute-Force-Schutz (bei eigenem Server)
+- Regelmäßige Backups der MySQL-Datenbank (dogado-Kundencenter bietet i.d.R. automatische Backups) und von `api/uploads/`
 
 ## Support
 
@@ -405,4 +424,5 @@ Bei Problemen:
 2. Prüfe Server-Logs:
    - nginx: `/var/log/nginx/error.log`
    - Apache: `/var/log/apache2/error.log`
-3. Prüfe Firebase Console auf Fehler/Limits
+   - dogado: PHP-Error-Logs im Kundencenter
+3. Prüfe in phpMyAdmin, ob die Tabellen `users`, `persons`, `clothing` existieren und Daten enthalten

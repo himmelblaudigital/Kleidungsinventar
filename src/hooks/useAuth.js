@@ -1,12 +1,5 @@
 import { useState, useEffect } from 'react'
-import {
-  signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence
-} from 'firebase/auth'
-import { auth } from '../firebase/config'
+import { login as apiLogin, logout as apiLogout, fetchCurrentUser } from '../api/auth'
 
 export function useAuth() {
   const [user, setUser] = useState(null)
@@ -14,39 +7,26 @@ export function useAuth() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Set persistence to LOCAL (survives browser restarts)
-    setPersistence(auth, browserLocalPersistence)
-      .catch((error) => {
-        console.error('Error setting persistence:', error)
+    fetchCurrentUser()
+      .then((result) => setUser(result?.user ?? null))
+      .catch((err) => {
+        console.error('Error checking session:', err)
+        setUser(null)
       })
-
-    // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
-      setLoading(false)
-    })
-
-    return unsubscribe
+      .finally(() => setLoading(false))
   }, [])
 
   const signIn = async (email, password) => {
     try {
       setError(null)
       setLoading(true)
-      await signInWithEmailAndPassword(auth, email, password)
+      const result = await apiLogin(email, password)
+      setUser(result.user)
+      setLoading(false)
       return { success: true }
-    } catch (error) {
-      console.error('Login error:', error)
-      let errorMessage = 'Anmeldung fehlgeschlagen'
-
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-        errorMessage = 'Ungültige Email oder Passwort'
-      } else if (error.code === 'auth/user-not-found') {
-        errorMessage = 'Kein Benutzer mit dieser Email gefunden'
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Zu viele Anmeldeversuche. Bitte später erneut versuchen.'
-      }
-
+    } catch (err) {
+      console.error('Login error:', err)
+      const errorMessage = err.message || 'Anmeldung fehlgeschlagen'
       setError(errorMessage)
       setLoading(false)
       return { success: false, error: errorMessage }
@@ -55,10 +35,11 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      await firebaseSignOut(auth)
+      await apiLogout()
+      setUser(null)
       return { success: true }
-    } catch (error) {
-      console.error('Logout error:', error)
+    } catch (err) {
+      console.error('Logout error:', err)
       return { success: false, error: 'Abmeldung fehlgeschlagen' }
     }
   }
@@ -69,6 +50,6 @@ export function useAuth() {
     error,
     signIn,
     signOut,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
   }
 }

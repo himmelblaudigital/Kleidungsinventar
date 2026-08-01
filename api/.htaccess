@@ -1,0 +1,4 @@
+# Interne Include-Dateien dürfen nicht direkt aufgerufen werden.
+<FilesMatch "^(config|config\.example|config_loader|db|bootstrap)\.php$">
+    Require all denied
+</FilesMatch>

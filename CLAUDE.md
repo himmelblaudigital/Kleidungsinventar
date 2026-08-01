@@ -20,7 +20,9 @@ npm run lint     # Run ESLint
 - **Framework**: React with Vite
 - **Styling**: Tailwind CSS
 - **Icons**: Lucide-React
-- **Data Storage**: LocalStorage (initial version) or Supabase/Firebase for cloud sync
+- **Backend**: PHP REST API (`api/`) talking to MySQL via PDO, hosted alongside the static frontend build (e.g. dogado shared hosting)
+- **Data Storage**: MySQL (schema in `db/schema.sql`); clothing images are stored as files on the server under `api/uploads/`
+- **Auth**: Own session-based login (bcrypt password hashes in the `users` table, PHP session cookie) — see `api/auth/*.php` and SETUP_AUTH.md
 
 ## Data Model
 
@@ -39,7 +41,10 @@ The application uses the following data structure:
 - `farbe`: Color
 - `marke`: Brand
 - `status`: Current status (vorhanden/available, aussortiert/discarded, zu klein/too small)
-- `bildURL`: Image URL
+- `imageUrl`: Public URL of the uploaded image (served from `api/uploads/`)
+- `imagePath`: Relative storage path, used to delete/replace the image later
+
+See `db/schema.sql` for the actual MySQL column names (snake_case); the API (`api/persons.php`, `api/clothing.php`) translates to/from the camelCase fields above.
 
 ## Core Features
 
@@ -74,5 +79,6 @@ Expected component hierarchy:
 ## Development Notes
 
 - Design should be modern, light, and mobile-friendly
-- All data persists to browser LocalStorage
+- All data persists to the MySQL database via the PHP API in `api/`; the frontend never talks to the database directly
+- Local dev requires the PHP API running alongside Vite (`php -S localhost:8000` in the project root; Vite proxies `/api` to it, see `vite.config.js`) and `api/config.php` set up (copy from `api/config.example.php`) against a local/dev MySQL database
 - Use German language for UI labels and messages to match the target audience

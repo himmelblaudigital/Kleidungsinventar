@@ -28,10 +28,11 @@ dist-ssr
 .env.local
 .env.*.local
 
-# Firebase
-.firebase/
-firebase-debug.log
-firestore-debug.log
+# PHP-API (lokale Zugangsdaten & hochgeladene Bilder nicht versionieren)
+api/config.php
+api/uploads/*
+!api/uploads/.gitkeep
+!api/uploads/.htaccess
 
 # Screenshots
 Bildschirmfoto*.png
