@@ -196,7 +196,7 @@ function App() {
           // Upload new image
           const { downloadURL, storagePath } = await uploadClothingImage(
             imageFile,
-            selectedPerson.id,
+            formData.personId || editingClothing.personId,
             editingClothing.id
           )
           imageUrl = downloadURL
@@ -221,7 +221,7 @@ function App() {
       setEditingClothing(null)
     } catch (error) {
       console.error('Error saving clothing:', error)
-      setToast({ message: 'Fehler beim Speichern des Kleidungsstücks', type: 'error' })
+      setToast({ message: `Fehler beim Speichern des Kleidungsstücks: ${error.message}`, type: 'error' })
     }
   }
 
