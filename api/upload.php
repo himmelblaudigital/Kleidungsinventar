@@ -31,12 +31,27 @@ if ($method === 'POST') {
     $personId = (int)($_POST['personId'] ?? 0);
     $clothingId = (int)($_POST['clothingId'] ?? 0);
 
+    // Überschreitet der Request post_max_size, leert PHP $_POST und $_FILES komplett.
+    if (empty($_POST) && empty($_FILES) && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        json_error('Bild ist für die Server-Einstellung zu groß (post_max_size: ' . ini_get('post_max_size') . ')', 413);
+    }
+
     if ($personId <= 0 || $clothingId <= 0) {
         json_error('personId und clothingId sind erforderlich', 400);
     }
 
-    if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-        json_error('Kein gültiges Bild empfangen', 400);
+    $uploadError = $_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE;
+    if ($uploadError !== UPLOAD_ERR_OK) {
+        $messages = [
+            UPLOAD_ERR_INI_SIZE => 'Bild ist für die Server-Einstellung zu groß (upload_max_filesize: ' . ini_get('upload_max_filesize') . ')',
+            UPLOAD_ERR_FORM_SIZE => 'Bild ist zu groß',
+            UPLOAD_ERR_PARTIAL => 'Bild wurde nur teilweise hochgeladen',
+            UPLOAD_ERR_NO_FILE => 'Kein Bild empfangen',
+            UPLOAD_ERR_NO_TMP_DIR => 'Server hat kein temporäres Upload-Verzeichnis',
+            UPLOAD_ERR_CANT_WRITE => 'Server konnte die Datei nicht schreiben',
+            UPLOAD_ERR_EXTENSION => 'Upload wurde von einer PHP-Erweiterung gestoppt',
+        ];
+        json_error($messages[$uploadError] ?? 'Upload fehlgeschlagen (Code ' . $uploadError . ')', 400);
     }
 
     $file = $_FILES['image'];
